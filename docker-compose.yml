@@ -3,10 +3,11 @@ services:
     web:
         image: nginx:alpine
         volumes:
-            - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
+            - "./etc/nginx:/etc/nginx/conf.d"
+            # - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
             - "./etc/ssl:/etc/ssl"
-            - "./web:/var/www/html"
-            - "./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
+            # - "./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
+            - "/zero/current_projects/html:/var/www/html"
         ports:
             - "8000:80"
             - "3000:443"
@@ -15,7 +16,7 @@ services:
                 ipv4_address: ${NGINX_HOST}
         environment:
             - NGINX_HOST=${NGINX_HOST}
-        command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+        command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
         # restart: always
         depends_on:
             - php
@@ -28,7 +29,7 @@ services:
         # restart: always
         volumes:
             - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
-            - "./web:/var/www/html"
+            - "/zero/current_projects/html:/var/www/html"
     composer:
         image: "composer"
         volumes:
@@ -66,7 +67,7 @@ services:
                 ipv4_address: ${MYSQL_HOST_IP}
         volumes:
             # - "/zero/mysql-files:/var/lib/mysql"
-            - "./data/db/mysql:/var/lib/mysql"
+            - "/zero/mysql-files:/var/lib/mysql"
 
 networks:
     mynetwork:
